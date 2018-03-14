@@ -1,0 +1,10 @@
+
+
+Flask==0.12.2
+Flask-Admin==1.5.1
+Flask-BasicAuth==0.2.0
+SQLAlchemy==1.2.5
+Flask-SQLAlchemy==2.3.2
+#flaskrestgen==0.4
+flask-restless==0.17.0
+flask-cors=3.0.3

@@ -1,0 +1,177 @@
+
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<style type="text/css">
+h2 {
+  text-align: center;
+}
+</style>
+  <script src="{{ url_for('static', filename='js/Chart.bundle.js', _external=True) }}" ></script>
+  <script src="{{ url_for('static', filename='js/utils.js', _external=True) }}" ></script>
+
+    <div class="loading">加载中...</div>
+    <h2>今日销售：<span class="todayAmount"></span>元</h2>
+    <div style="width:90%;">
+      <canvas id="canvas"></canvas>
+      <canvas id="canvas2"></canvas>
+    </div>
+  <script>
+// location.href = '/admin/product/';
+
+function formatDate(dateObj) {
+  return dateObj.getFullYear() + '-' + (dateObj.getMonth()+1)
+    + '-' + dateObj.getDate();
+}
+
+window.onload = function() {
+  var startDate = '2017';
+  var endDate = '2018';
+  var q = {
+    filters: [{name: 'created_at', op: '>', val: startDate}, {name: 'created_at', op: '<', val: endDate}]
+  };
+
+  var MONTHS = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+  var monthsAmountConfig = {
+    type: 'line',
+    data: {
+      labels: MONTHS,
+      datasets: [{
+        label: '金额',
+        backgroundColor: window.chartColors.red,
+        borderColor: window.chartColors.red,
+        data: [],
+        fill: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      title: {
+        display: true,
+        text: '每月销售记录'
+      },
+      tooltips: {
+        mode: 'index',
+        intersect: false,
+      },
+      hover: {
+        mode: 'nearest',
+        intersect: true
+      },
+      scales: {
+        xAxes: [{
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: '月份'
+          }
+        }],
+        yAxes: [{
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: '金额(元)'
+          }
+        }]
+      }
+    }
+  };
+
+  var monthsOrdersConfig = {
+    type: 'line',
+    data: {
+      labels: MONTHS,
+      datasets: [{
+        label: '每月订单数',
+        backgroundColor: window.chartColors.green,
+        borderColor: window.chartColors.green,
+        data: [],
+        fill: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      title: {
+        display: true,
+        text: '订单数'
+      },
+      tooltips: {
+        mode: 'index',
+        intersect: false,
+      },
+      hover: {
+        mode: 'nearest',
+        intersect: true
+      },
+      scales: {
+        xAxes: [{
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: '月份'
+          }
+        }],
+        yAxes: [{
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: '订单数'
+          }
+        }]
+      }
+    }
+  };
+  var ctx = document.getElementById('canvas').getContext('2d');
+  window.myLine = new Chart(ctx, monthsAmountConfig);
+  var ctx2 = document.getElementById('canvas2').getContext('2d');
+  window.myOrderLine = new Chart(ctx2, monthsOrdersConfig);
+
+  // FIXME: can't use fetch, it is too slow
+  $.getJSON('http://localhost:5000/api/order') // ?q=' + JSON.stringify(q))
+  // .then(res => res.json())
+    .then(
+      (result) => {
+        $('.loading').hide();
+
+        var today = formatDate(new Date());
+        var todayAmount = 0;
+        var monthsAmount = [];
+        var monthsOrders = [];
+        for(var i=0; i < 12; i++) {
+          monthsAmount.push(0);
+          monthsOrders.push(0);
+        }
+
+        result.objects.forEach(function(order) {
+          if (order.status != 'paid' && order.status != 'fin') {
+            return;
+          }
+
+          var date = new Date(order.created_at);
+          var month = date.getMonth();
+
+          if (!monthsAmount[month]) monthsAmount[month] = 0;
+          if (!monthsOrders[month]) monthsOrders[month] = 0;
+          monthsAmount[month] += order.amount;
+          monthsOrders[month]++;
+
+          if (today === formatDate(new Date(order.created_at))) {
+            todayAmount += order.amount;
+          }
+        });
+
+
+        $('.todayAmount').html(todayAmount);
+
+        monthsAmountConfig.data.datasets[0].data = monthsAmount;
+        window.myLine.update();
+        monthsOrdersConfig.data.datasets[0].data = monthsOrders;
+        window.myOrderLine.update();
+      },
+      (error) => {
+      }
+    );
+};
+  </script>
+
+{% endblock %}

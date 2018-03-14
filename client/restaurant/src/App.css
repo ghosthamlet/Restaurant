@@ -1,0 +1,80 @@
+.page-header h1 {font-size: 26px; text-align: center}
+
+h1 button{margin:0 5px}
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.hide {display:none}
+
+.orders {
+  min-height: 800px;
+}
+
+.orders .row {
+  height: 150px;
+}
+
+.orders > .row > div {
+  height: 150px;
+  border: 1px solid #CCC;
+  background-color:#FFF;
+}
+
+.orders > .row > div:hover {
+  background-color:#DEDEDE;
+}
+
+.amount{
+  border-bottom: 1px solid #AAA;
+  margin-bottom: 10px;
+}
+
+.amount .number{
+  color: #C00;
+  font-size: 20px;
+}
+
+.tooltip-products {
+  border:1px solid #CCC;
+}
+
+.tooltip-remark, .tooltip-products div{
+  display: inline-block;
+  padding: 0 5px;
+}
+
+.tooltip-container {border:1px solid #CCC}
+
+.btn-toolbar .btn-default:active, .btn-toolbar .btn-default.active {
+  color: #FFF;
+  text-shadow: none;
+  background-color: #286090;
+  border-color: #286090;
+}
